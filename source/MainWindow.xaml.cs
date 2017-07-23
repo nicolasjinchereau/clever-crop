@@ -38,8 +38,6 @@ namespace ShowdownSoftware
             selectionBorder.StrokeThickness = 1;
             overlay.Children.Add(selectionBorder);
             
-            cmbSaveMode.SelectedIndex = Properties.Settings.Default.saveMode;
-
             string[] args = Environment.GetCommandLineArgs();
             if(args.Length > 1){
                 LoadFile(args[1]);
@@ -69,6 +67,7 @@ namespace ShowdownSoftware
                     SelectAll();
 
                 UpdateWindowTitle();
+                lblStatus.Text = "Loaded image: " + file;
             }
             catch(Exception ex)
             {
@@ -177,15 +176,6 @@ namespace ShowdownSoftware
             SelectContent();
         }
         
-        private void cmbSaveMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if(IsLoaded && Properties.Settings.Default.saveMode != cmbSaveMode.SelectedIndex)
-            {
-                Properties.Settings.Default.saveMode = cmbSaveMode.SelectedIndex;
-                Properties.Settings.Default.Save();
-            }
-        }
-        
         private void btnBrowseClear_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var nativeWindow = new WinForms.NativeWindow();
@@ -231,23 +221,6 @@ namespace ShowdownSoftware
 
         private void btnCopyImage_Click(object sender, RoutedEventArgs e) {
             CopyImage();
-        }
-        
-        private void btnSaveImage_Click(object sender, RoutedEventArgs e)
-        {
-            if(currentImage == null)
-                return;
-
-            var saveMode = Properties.Settings.Default.saveMode;
-
-            if(saveMode == 0)
-                SaveImage();
-            else if(saveMode == 1)
-                SaveImageAs();
-            else if(saveMode == 2)
-                SaveImageCopy();
-            else if(saveMode == 3)
-                SaveImageToExportPath();
         }
         
         private void mnuOpen_Click(object sender, RoutedEventArgs e) {
@@ -375,12 +348,28 @@ namespace ShowdownSoftware
             SaveImageToPath(Util.GetSavePath(this, Path.GetFileName(currentFile)), true);
         }
 
+        bool PromptOverwrite(string filepath)
+        {
+            var res = MessageBox.Show(
+                "'" + filepath + "' already exists.\r\nDo you want to replace it?",
+                "Confirm Overwriting File",
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Warning);
+
+            return res == MessageBoxResult.OK;
+        }
+
         void SaveImageCopy()
         {
             if(currentImage == null)
                 return;
             
-            SaveImageToPath(Util.AppendFileTag(currentFile, "_cropped"), false);
+            var savePath = Util.AppendFileTag(currentFile, "_cropped");
+
+            if(File.Exists(savePath) && !PromptOverwrite(savePath))
+                return;
+            
+            SaveImageToPath(savePath, false);
         }
 
         void SaveImageToExportPath()
@@ -395,6 +384,10 @@ namespace ShowdownSoftware
             {
                 string filename = Path.GetFileName(currentFile);
                 savePath = Path.Combine(Properties.Settings.Default.exportPath, filename);
+
+                if(File.Exists(savePath) && !PromptOverwrite(savePath))
+                    return;
+
                 SaveImageToPath(savePath, false);
             }
         }
@@ -424,6 +417,8 @@ namespace ShowdownSoftware
                                 currentFile = savePath;
                                 UpdateWindowTitle();
                             }
+
+                            lblStatus.Text = "Saved image: " + savePath;
                         }
                         else
                         {
@@ -433,7 +428,7 @@ namespace ShowdownSoftware
                 }
             }
             catch(Exception ex) {
-                MessageBox.Show(ex.ToString(), "Failed to save image");
+                lblStatus.Text = "Failed to save image: " + ex.Message;
             }
             finally {
                 Cursor = Cursors.Arrow;

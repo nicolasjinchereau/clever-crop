@@ -34,17 +34,5 @@ namespace ShowdownSoftware.Properties {
                 this["exportPath"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int saveMode {
-            get {
-                return ((int)(this["saveMode"]));
-            }
-            set {
-                this["saveMode"] = value;
-            }
-        }
     }
 }

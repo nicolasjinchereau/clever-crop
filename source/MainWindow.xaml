@@ -9,6 +9,7 @@
         Title="Clever Crop"
         MinWidth="670" MinHeight="200"
         Width="800"  Height="600"
+        ResizeMode="CanResizeWithGrip"
         AllowDrop="True" Drop="image_Drop" Loaded="Window_Loaded" Icon="Resources/app_icon.ico">
 
     <Grid Margin="4" ShowGridLines="False" Name="mainGrid">
@@ -18,12 +19,15 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Grid.Column="0">
-            <Menu>
+            <Menu Background="{x:Static SystemColors.WindowBrush}"
+                  BorderThickness="0,0,0,1"
+                  BorderBrush="{x:Static SystemColors.ControlDarkBrush}">
                 <MenuItem Header="File">
                     <MenuItem x:Name="mnuOpen" Header="Open" Click="mnuOpen_Click"/>
                     <MenuItem x:Name="mnuRevert" Header="Revert" Click="mnuRevert_Click"/>
@@ -133,40 +137,30 @@
             </Canvas>
         </Button>
 
-        <Button Grid.Row="1" Grid.Column="0"
-                x:Name="btnSaveImage"
-                ToolTip="Save Image"
-                Width="30" Height="30"
-                HorizontalAlignment="Right" VerticalAlignment="Center"
-                Margin="0,5,5,5" Click="btnSaveImage_Click">
-            <Canvas>
-                <Image Source="Resources/SaveIcon.png" Width="28" Height="28"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Canvas.Left="-14" Canvas.Top="-14"/>
-            </Canvas>
-        </Button>
-
-        <ComboBox Grid.Row="1" Grid.Column="0"
-                  x:Name="cmbSaveMode"
-                  Width="120" Height="30"
-                  HorizontalAlignment="Right" VerticalAlignment="Center"
-                  VerticalContentAlignment="Center"
-                  Margin="0,6,40,6"
-                  SelectionChanged="cmbSaveMode_SelectionChanged">
-            <ComboBoxItem IsSelected="True" ToolTip="Overwrite the original file">
-                Save
-            </ComboBoxItem>
-            <ComboBoxItem ToolTip="Choose where to save a copy of the file">
-                Save As
-            </ComboBoxItem>
-            <ComboBoxItem ToolTip="Save a copy next to the original file with '_cropped' appended to the filename">
-                Save Copy
-            </ComboBoxItem>
-            <ComboBoxItem ToolTip="Save the image to the export path specified below">
-                Export Copy
-            </ComboBoxItem>
-        </ComboBox>
-
+        <Menu x:Name="mnuSaveMode"
+              Grid.Row="1" Grid.Column="0"
+              Width="155" Height="30"
+              Margin="0,6,5,6"
+              HorizontalAlignment="Right" VerticalAlignment="Center"
+              VerticalContentAlignment="Center">
+            <MenuItem Width="155" Height="30">
+                <MenuItem.Header>
+                    <Grid Width="145" Height="20">
+                        <Image Width="20" Height="20" Source="Resources/SaveIcon.png"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"/>
+                        <ContentPresenter Content="Save Image..."
+                                          HorizontalAlignment="Left"
+                                          VerticalAlignment="Center"/>
+                    </Grid>
+                </MenuItem.Header>
+                <MenuItem x:Name="mnuToolbarSave" Header="Save (Overwrite)" Click="mnuSave_Click" ToolTip="Overwrite the original file"/>
+                <MenuItem x:Name="mnuToolbarSaveAs" Header="Save As" Click="mnuSaveAs_Click" ToolTip="Choose where to save a copy of the file"/>
+                <MenuItem x:Name="mnuToolbarSaveCopy" Header="Save Copy" Click="mnuSaveCopy_Click" ToolTip="Save a copy next to the original file with '_cropped' appended to the filename"/>
+                <MenuItem x:Name="mnuToolbarExportCopy" Header="Export Copy" Click="mnuExportCopy_Click" ToolTip="Save the image to the export path specified below"/>
+            </MenuItem>
+        </Menu>
+        
         <Label Grid.Row="2" Grid.Column="0"
                HorizontalAlignment="Left" VerticalAlignment="Center"
                HorizontalContentAlignment="Right"
@@ -228,5 +222,14 @@
                         HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </Grid>
         </ScrollViewer>
+        <StatusBar Grid.Row="5" Grid.Column="0">
+            <StatusBarItem HorizontalContentAlignment="Stretch">
+                <Border BorderThickness="1,1,0,0" BorderBrush="{x:Static SystemColors.ControlDarkBrush}">
+                    <Border BorderThickness="0,0,1,1" BorderBrush="{x:Static SystemColors.ControlLightBrush}">
+                        <TextBlock x:Name="lblStatus" Text=""/>
+                    </Border>
+                </Border>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>
