@@ -1,0 +1,9 @@
+obj/
+/source/bin/
+/bin/
+.vs
+*.exe.config
+*.exe.manifest
+*.vshost.exe
+*.VC.opendb
+*.VC.db
